@@ -2,6 +2,7 @@ from django.db.models import F
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils import timezone
 from django.views import generic
 
 from .models import Choice, Question
@@ -19,7 +20,7 @@ class IndexView(generic.ListView):
     #this sets the model similar to model=Question below
     def get_queryset(self):
         #retrieves 5 most recent questions
-        return Question.objects.order_by("-pub_date")[:5]
+        return Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[:5]
 
 # def detail(request, question_id):
 #     q = get_object_or_404(Question, pk=question_id)
@@ -29,6 +30,9 @@ class DetailView(generic.DetailView):
     model = Question
     template_name = "polls/detail.html"
     #don't need to set context_object_name=question bc django defaults to model.tolowercase()
+
+    def get_queryset(self):
+        return Question.objects.filter(pub_date__lte=timezone.now())
 
 # def results(request, question_id):
 #     q = get_object_or_404(Question, pk=question_id)
